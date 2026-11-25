@@ -1,0 +1,697 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>MOODI</title>
+<meta name="description" content="MOODI - app quản lý chi tiêu cho Gen Z dựa trên mental accounting: hũ tài khoản tinh thần, luật giữ 50% tiền bất ngờ, quy đổi giá trước khi mua và gương cảm xúc.">
+<meta name="theme-color" content="#0F3D35">
+<meta property="og:title" content="MOODI">
+<meta property="og:description" content="Chia tiền vào hũ theo mục tiêu sống, dừng lại trước khi mua bốc đồng.">
+<meta property="og:type" content="website">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="MOODI">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%230F3D35'/%3E%3Crect x='20' y='8' width='24' height='7' rx='3.5' fill='%23FFC93C'/%3E%3Cpath d='M23 17h18v4c6 2 10 7 10 14v16a6 6 0 0 1-6 6H19a6 6 0 0 1-6-6V35c0-7 4-12 10-14z' fill='none' stroke='%23EAF7F2' stroke-width='4'/%3E%3Cpath d='M16 41q8-4 16 0t16 0v9a4 4 0 0 1-4 4H20a4 4 0 0 1-4-4z' fill='%23FFC93C'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap">
+<style>
+/* Base reset for standalone hosting */
+:root{color-scheme:light;padding-top:env(safe-area-inset-top, 0px);padding-bottom:env(safe-area-inset-bottom, 0px)}
+body{margin:0;font:14px system-ui, -apple-system, "Segoe UI", sans-serif}
+img{max-width:100%}
+[hidden]{display:none!important}
+/* Layout: phone-width column; dark jade "today" ticket on top, glass jars below, floating ink tab bar with a round add button */
+:root{
+  --bg:#F1F3F7; --surface:#FFFFFF; --sunk:#E8EBF1; --ink:#161A2B; --muted:#646C82; --line:#DDE1EA;
+  --hero:#0F3D35; --hero-2:#14524A; --hero-ink:#EAF7F2; --hero-muted:#9CC7BA;
+  --accent:#0E7C66; --accent-ink:#FFFFFF; --sun:#FFC93C; --coral:#F25C3B;
+  --peace:#4B7BE5; --youth:#FF7A45; --protect:#1FA37A; --spend:#C04FA0;
+  --good:#1FA37A; --warn:#E3A008; --bad:#E0483A;
+  --nav:#161A2B; --nav-ink:#B9BFD0; --nav-on:#FFFFFF;
+  --display:"Baloo 2", "Be Vietnam Pro", system-ui, sans-serif;
+  --body:"Be Vietnam Pro", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --r:22px; --shadow:0 1px 2px rgb(22 26 43 / .05), 0 6px 20px rgb(22 26 43 / .06);
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0D1016; --surface:#171B24; --sunk:#212634; --ink:#ECEFF6; --muted:#9AA2B8; --line:#2A3041;
+  --hero:#113A33; --hero-2:#175048; --hero-ink:#EAF7F2; --hero-muted:#8FC3B4;
+  --accent:#3FD0AE; --accent-ink:#06231C; --sun:#FFD15C; --coral:#FF8466;
+  --peace:#7DA2F2; --youth:#FF9563; --protect:#45C79A; --spend:#DE7CC2;
+  --good:#45C79A; --warn:#F2BF3D; --bad:#FF7466;
+  --nav:#232838; --nav-ink:#9AA2B8; --nav-on:#FFFFFF;
+  --shadow:0 1px 2px rgb(0 0 0 / .3); color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0D1016; --surface:#171B24; --sunk:#212634; --ink:#ECEFF6; --muted:#9AA2B8; --line:#2A3041;
+  --hero:#113A33; --hero-2:#175048; --hero-ink:#EAF7F2; --hero-muted:#8FC3B4;
+  --accent:#3FD0AE; --accent-ink:#06231C; --sun:#FFD15C; --coral:#FF8466;
+  --peace:#7DA2F2; --youth:#FF9563; --protect:#45C79A; --spend:#DE7CC2;
+  --good:#45C79A; --warn:#F2BF3D; --bad:#FF7466;
+  --nav:#232838; --nav-ink:#9AA2B8; --nav-on:#FFFFFF;
+  --shadow:0 1px 2px rgb(0 0 0 / .3); color-scheme:dark}
+html,body{height:100%}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.5;-webkit-font-smoothing:antialiased}
+*{box-sizing:border-box}
+button,input,select{font:inherit;color:inherit}
+button{cursor:pointer;-webkit-tap-highlight-color:transparent}
+:focus-visible{outline:2.5px solid var(--accent);outline-offset:2px}
+.num{font-variant-numeric:tabular-nums}
+.app{max-width:440px;margin:0 auto;min-height:100%;display:flex;flex-direction:column;
+  padding-left:max(16px, env(safe-area-inset-left, 0px));padding-right:max(16px, env(safe-area-inset-right, 0px))}
+header.top{display:flex;align-items:center;justify-content:space-between;gap:12px;padding-block:20px 12px}
+.hello{display:flex;flex-direction:column}
+.hello small{color:var(--muted);font-size:13px;font-weight:500}
+.hello b{font-family:var(--display);font-size:24px;font-weight:700;line-height:1.15}
+.brand{display:flex;align-items:center;gap:8px}
+.logo{width:40px;height:40px;border-radius:14px;background:var(--hero);display:grid;place-items:center}
+.sample{font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);border:1px dashed var(--line);padding:3px 8px;border-radius:99px;font-weight:600}
+main{flex:1;display:flex;flex-direction:column;gap:16px;padding-bottom:120px}
+h1,h2,h3{font-family:var(--display);margin:0;line-height:1.15;text-wrap:balance}
+h1{font-size:30px;font-weight:800}
+h2{font-size:20px;font-weight:700}
+.label{font-size:11px;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);font-weight:700}
+.card{background:var(--surface);border-radius:var(--r);padding:18px;box-shadow:var(--shadow)}
+.muted{color:var(--muted)}
+.row{display:flex;align-items:center;gap:10px}
+.between{justify-content:space-between}
+.stack{display:flex;flex-direction:column;gap:12px}
+.sec{display:flex;align-items:baseline;justify-content:space-between;gap:8px;margin-top:4px}
+.link{border:0;background:none;color:var(--accent);font-weight:700;font-size:13.5px;padding:0}
+
+/* hero ticket */
+.hero{position:relative;overflow:hidden;border-radius:28px;padding:20px;color:var(--hero-ink);
+  background:radial-gradient(120% 90% at 100% 0%, var(--hero-2) 0%, transparent 60%), var(--hero);display:flex;flex-direction:column;gap:16px}
+.hero::after{content:"";position:absolute;right:-40px;bottom:-60px;width:180px;height:180px;border-radius:50%;border:28px solid rgb(255 255 255 / .04)}
+.hero-top{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.hlabel{font-size:12px;font-weight:600;color:var(--hero-muted);letter-spacing:.04em}
+.hbig{font-family:var(--display);font-size:40px;font-weight:800;line-height:1.05;margin-top:2px}
+.hsub{font-size:13px;color:var(--hero-muted);margin-top:4px}
+.ring{flex:none;position:relative;width:96px;height:96px}
+.ring svg{width:100%;height:100%;transform:rotate(-90deg)}
+.ring circle{fill:none;stroke-width:9;stroke-linecap:round}
+.ring .bgc{stroke:rgb(255 255 255 / .12)}
+.ring .fg{transition:stroke-dashoffset .8s cubic-bezier(.2,.8,.2,1)}
+.ring span{position:absolute;inset:0;display:grid;place-items:center;text-align:center;font-size:11px;color:var(--hero-muted);line-height:1.1}
+.ring span b{display:block;font-family:var(--display);font-size:22px;color:var(--hero-ink)}
+.pill{align-self:flex-start;font-size:13px;font-weight:600;padding:6px 12px;border-radius:99px;background:rgb(255 255 255 / .1)}
+.pill.warn{background:var(--sun);color:#3A2A00}
+.pill.bad{background:var(--coral);color:#fff}
+.streak{display:flex;align-items:center;gap:12px;padding-top:14px;border-top:1px solid rgb(255 255 255 / .1);position:relative;z-index:1}
+.flame{width:42px;height:42px;flex:none;border-radius:14px;display:grid;place-items:center;background:var(--sun);color:#3A2A00}
+.flame svg{width:22px;height:22px}
+.streak .t{flex:1;min-width:0}
+.streak .t b{font-size:14px}
+.dots{display:grid;grid-template-columns:repeat(14,1fr);gap:4px;margin-top:6px}
+.dots i{height:8px;border-radius:4px;background:rgb(255 255 255 / .12)}
+.dots i.on{background:var(--sun)} .dots i.over{background:var(--coral)}
+
+/* mini stats */
+.minis{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.mini{background:var(--surface);border-radius:var(--r);padding:14px;box-shadow:var(--shadow);border:0;text-align:left;display:flex;flex-direction:column;gap:6px}
+.mini .ic{width:32px;height:32px;border-radius:10px;display:grid;place-items:center;background:color-mix(in srgb,var(--c) 16%,var(--surface));color:var(--c)}
+.mini .ic svg{width:18px;height:18px}
+.mini b{font-family:var(--display);font-size:22px;line-height:1.1}
+.mini small{color:var(--muted);font-size:12.5px;line-height:1.35}
+
+/* jars */
+.jars{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.jar{border:0;text-align:left;border-radius:var(--r);padding:14px 14px 16px;display:flex;flex-direction:column;gap:2px;
+  background:linear-gradient(180deg, color-mix(in srgb,var(--c) 14%,var(--surface)) 0%, var(--surface) 70%);box-shadow:var(--shadow)}
+.jar .vis{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:8px}
+.jar .pct{font-family:var(--display);font-weight:800;font-size:15px;color:var(--c)}
+.jar .name{font-size:12.5px;font-weight:600;line-height:1.3;color:var(--muted)}
+.jar .bal{font-family:var(--display);font-weight:800;font-size:20px;line-height:1.2}
+.jar .goal{font-size:11.5px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+svg.jarsvg{width:54px;height:68px;overflow:visible}
+.wave{animation:wave 3.2s linear infinite}
+@keyframes wave{to{transform:translateX(60px)}}
+.jarbig{background:var(--surface);border-radius:var(--r);padding:16px;display:flex;gap:16px;align-items:center;box-shadow:var(--shadow)}
+.jarbig svg.jarsvg{width:72px;height:92px;flex:none}
+.jarbig .info{flex:1;min-width:0;display:flex;flex-direction:column;gap:6px}
+.bar{height:8px;border-radius:99px;background:var(--sunk);overflow:hidden}
+.bar i{display:block;height:100%;border-radius:99px;background:var(--c)}
+
+/* list */
+.tx{display:flex;align-items:center;gap:12px;padding:11px 0}
+.tx + .tx{border-top:1px solid var(--line)}
+.tile{width:42px;height:42px;border-radius:14px;display:grid;place-items:center;flex:none;font-size:19px;background:color-mix(in srgb,var(--c) 15%,var(--surface))}
+.tx .t{flex:1;min-width:0}
+.tx .t div:first-child{font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tx .t div:last-child{font-size:12px;color:var(--muted);display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.amt{font-family:var(--display);font-weight:700;font-size:16px}
+.amt.in{color:var(--good)}
+.tag{display:inline-block;font-size:10.5px;padding:1px 8px;border-radius:99px;background:var(--sunk);color:var(--muted);font-weight:700}
+.tag.unplanned{background:color-mix(in srgb,var(--coral) 16%,var(--surface));color:var(--coral)}
+
+/* nav */
+nav.tabs{position:fixed;left:0;right:0;bottom:0;z-index:5;display:flex;justify-content:center;
+  padding:0 max(16px, env(safe-area-inset-right, 0px)) calc(12px + env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px));pointer-events:none}
+nav.tabs .in{pointer-events:auto;width:100%;max-width:408px;background:var(--nav);border-radius:26px;display:grid;grid-template-columns:1fr 1fr 72px 1fr 1fr;align-items:center;padding:8px;box-shadow:0 12px 30px rgb(10 12 20 / .28)}
+.tab{border:0;background:none;padding:6px 2px;border-radius:16px;font-size:11px;font-weight:600;color:var(--nav-ink);display:flex;flex-direction:column;align-items:center;gap:3px}
+.tab svg{width:22px;height:22px}
+.tab[aria-current="page"]{color:var(--nav-on)}
+.tab[aria-current="page"] svg{color:var(--sun)}
+.add{justify-self:center;width:58px;height:58px;margin-top:-28px;border-radius:50%;border:5px solid var(--bg);background:var(--accent);color:var(--accent-ink);display:grid;place-items:center;box-shadow:0 8px 18px color-mix(in srgb,var(--accent) 45%,transparent)}
+.add svg{width:26px;height:26px}
+
+/* sheet */
+.scrim{position:fixed;inset:0;background:rgb(8 10 18 / .5);z-index:20;display:flex;align-items:flex-end;justify-content:center;animation:fade .2s}
+@keyframes fade{from{opacity:0}}
+.sheet{background:var(--bg);width:100%;max-width:440px;max-height:92%;overflow:auto;border-radius:28px 28px 0 0;
+  padding:14px max(18px, env(safe-area-inset-right, 0px)) calc(22px + env(safe-area-inset-bottom, 0px)) max(18px, env(safe-area-inset-left, 0px));display:flex;flex-direction:column;gap:16px;animation:up .28s cubic-bezier(.2,.8,.2,1)}
+@keyframes up{from{transform:translateY(40px)}}
+@media (prefers-reduced-motion: reduce){.sheet,.scrim{animation:none}.wave{animation:none}.ring .fg{transition:none}}
+.sheet .grip{width:44px;height:5px;border-radius:9px;background:var(--line);align-self:center}
+.sheet h2{font-size:22px}
+.amountWrap{background:var(--surface);border-radius:var(--r);padding:16px 18px 12px;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:2px}
+.amountWrap .row{align-items:baseline;gap:6px}
+.amountIn{font-family:var(--display);font-size:44px;font-weight:800;width:100%;min-width:0;border:0;background:transparent;padding:0;outline:none;color:var(--ink)}
+.amountIn::placeholder{color:var(--line)}
+.amountWrap .cur{font-family:var(--display);font-size:30px;color:var(--muted);font-weight:700}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{border:1.5px solid var(--line);background:var(--surface);border-radius:99px;padding:7px 13px;font-size:13.5px;font-weight:500;transition:transform .1s}
+.chip:active{transform:scale(.96)}
+.chip[aria-pressed="true"]{border-color:var(--ink);background:var(--ink);color:var(--bg);font-weight:700}
+.seg{display:grid;grid-template-columns:repeat(var(--n),1fr);gap:4px;background:var(--sunk);padding:4px;border-radius:16px}
+.seg button{border:0;background:none;border-radius:12px;padding:10px 6px;font-size:13px;font-weight:600;color:var(--muted);line-height:1.3}
+.seg button[aria-pressed="true"]{background:var(--surface);color:var(--ink);box-shadow:0 1px 4px rgb(0 0 0 / .1)}
+.jarpick{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.jarpick button{border:1.5px solid var(--line);background:var(--surface);border-radius:16px;padding:10px 12px;text-align:left;display:flex;flex-direction:column;gap:2px;font-size:12.5px;font-weight:600}
+.jarpick button span{font-family:var(--display);font-size:15px;color:var(--c)}
+.jarpick button[aria-pressed="true"]{border-color:var(--c);background:color-mix(in srgb,var(--c) 12%,var(--surface))}
+.btn{border:0;border-radius:18px;padding:15px;font-weight:700;font-size:15.5px;background:var(--accent);color:var(--accent-ink);width:100%;transition:transform .1s}
+.btn:active{transform:scale(.98)}
+.btn.ghost{background:var(--sunk);color:var(--ink)}
+.btn:disabled{opacity:.35;cursor:not-allowed;transform:none}
+.btns{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.alloc{display:flex;flex-direction:column;gap:10px}
+.alloc .r{display:flex;align-items:center;gap:10px;font-size:14px}
+.alloc .r i{width:12px;height:12px;border-radius:4px;background:var(--c);flex:none}
+.alloc .r span:nth-child(2){flex:1}
+.alloc .stackbar{display:flex;height:12px;border-radius:99px;overflow:hidden;gap:3px}
+.alloc .stackbar i{background:var(--c)}
+.note{border-radius:16px;padding:12px 14px;font-size:13.5px;background:var(--sunk)}
+.note.warn{background:color-mix(in srgb,var(--sun) 26%,var(--surface))}
+.choose{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.choose button{border:0;border-radius:var(--r);padding:20px 16px;text-align:left;display:flex;flex-direction:column;gap:10px;background:var(--surface);box-shadow:var(--shadow)}
+.choose button .tile{width:46px;height:46px}
+.choose button b{font-family:var(--display);font-size:20px}
+.choose button small{color:var(--muted);font-size:12.5px;line-height:1.35}
+
+/* pause */
+.convs{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.conv{border-radius:18px;padding:14px 10px;display:flex;flex-direction:column;gap:4px;background:color-mix(in srgb,var(--c) 15%,var(--surface))}
+.conv b{font-family:var(--display);font-size:26px;font-weight:800;line-height:1;color:var(--c)}
+.conv span{font-size:12px;line-height:1.35;color:var(--ink)}
+.moods{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.mood{border:1.5px solid var(--line);background:var(--surface);border-radius:16px;padding:10px 4px;display:flex;flex-direction:column;align-items:center;gap:2px;font-size:12.5px;font-weight:600}
+.mood span{font-size:24px;line-height:1.2}
+.mood[aria-pressed="true"]{border-color:var(--c);background:color-mix(in srgb,var(--c) 14%,var(--surface))}
+.q{font-family:var(--display);font-size:19px;font-weight:600;line-height:1.35;background:var(--surface);border-radius:18px;padding:14px 16px;box-shadow:var(--shadow)}
+.q small{display:block;font-family:var(--body);font-size:11px;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);font-weight:700;margin-bottom:4px}
+
+/* mirror */
+.mirrorHero{background:var(--hero);color:var(--hero-ink);border-radius:28px;padding:20px;display:flex;flex-direction:column;gap:6px}
+.mirrorHero .hbig{font-size:36px}
+.mbar{display:grid;grid-template-columns:112px 1fr 48px;align-items:center;gap:10px;font-size:13.5px}
+.mbar .track{height:16px;border-radius:8px;background:var(--sunk);overflow:hidden}
+.mbar .track i{display:block;height:100%;border-radius:8px;background:var(--c)}
+.mbar .v{text-align:right;font-weight:700}
+.field{display:flex;flex-direction:column;gap:6px}
+.field input,.field select{background:var(--surface);border:1.5px solid var(--line);border-radius:14px;padding:12px 14px;width:100%}
+.stepper{display:flex;align-items:center;gap:10px}
+.stepper button{width:40px;height:40px;border-radius:12px;border:0;background:var(--sunk);font-weight:800;font-size:18px}
+.result{font-size:15px;line-height:1.55}
+.result b{color:var(--accent)}
+.bigdays{font-family:var(--display);font-size:46px;font-weight:800;line-height:1;color:var(--accent)}
+.toast{position:fixed;left:50%;top:calc(14px + env(safe-area-inset-top, 0px));transform:translateX(-50%);z-index:40;background:var(--ink);color:var(--bg);padding:12px 16px;border-radius:16px;font-size:14px;font-weight:600;width:max-content;max-width:min(400px, calc(100% - 32px));box-shadow:0 10px 30px rgb(0 0 0 / .25);animation:fade .2s}
+.empty{text-align:center;padding:18px;color:var(--muted);font-size:14px}
+@media (max-width:360px){.jars,.minis{grid-template-columns:1fr}.mbar{grid-template-columns:92px 1fr 44px}.convs{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<div class="app">
+  <header class="top">
+    <div class="hello"><small id="today"></small><b id="greet">Chào bạn</b></div>
+    <div class="brand"><span class="sample" id="sampleBadge">Dữ liệu mẫu</span>
+      <div class="logo" aria-label="MOODI"><svg width="22" height="26" viewBox="0 0 60 76" aria-hidden="true"><rect x="15" y="0" width="30" height="7" rx="3.5" fill="#FFC93C"/><path d="M18 9h24v5c8 3 14 10 14 20v30a8 8 0 0 1-8 8H12a8 8 0 0 1-8-8V34c0-10 6-17 14-20z" fill="none" stroke="#EAF7F2" stroke-width="5"/><path d="M8 48q11-6 22 0t22 0V64a6 6 0 0 1-6 6H14a6 6 0 0 1-6-6z" fill="#FFC93C"/></svg></div></div>
+  </header>
+  <main id="screen"></main>
+</div>
+
+<nav class="tabs" aria-label="Điều hướng">
+  <div class="in">
+    <button class="tab" data-tab="home" aria-current="page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg>Hôm nay</button>
+    <button class="tab" data-tab="jars"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3h8M9 3v3c-2 1-4 3-4 6v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7c0-3-2-5-4-6V3"/><path d="M5 14h14"/></svg>Hũ</button>
+    <button class="add" data-action="openAdd" aria-label="Thêm khoản thu hoặc chi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></button>
+    <button class="tab" data-tab="mirror"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M8.5 14.5c1 1.2 2.2 1.8 3.5 1.8s2.5-.6 3.5-1.8"/><path d="M9 9.5h.01M15 9.5h.01"/></svg>Cảm xúc</button>
+    <button class="tab" data-tab="settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12"/><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="18" cy="18" r="2"/></svg>Cài đặt</button>
+  </div>
+</nav>
+
+<div id="sheetRoot"></div>
+<div id="toastRoot"></div>
+
+<script>
+(function(){
+const DAY = 864e5;
+const KEY = 'moodi-proto-v1';
+
+const JARS = [
+  {id:'peace',   name:'Quỹ tự do & Bình yên',       desc:'Tiết kiệm chung, dự phòng', c:'--peace'},
+  {id:'youth',   name:'Quỹ trải nghiệm thanh xuân', desc:'Du lịch, concert',          c:'--youth'},
+  {id:'protect', name:'Quỹ bảo vệ bản thân',        desc:'Sức khỏe, học tập',         c:'--protect'},
+  {id:'spend',   name:'Tiêu vặt',                   desc:'Ăn uống, đi lại hằng ngày', c:'--spend'}
+];
+const SALARY_SPLIT = {spend:.5, peace:.2, youth:.15, protect:.15};
+const SOURCES = [
+  {id:'salary', label:'Lương / tiền chính'},
+  {id:'bonus',  label:'Thưởng / lì xì'},
+  {id:'resale', label:'Bán đồ cũ'}
+];
+const CATS = [
+  {id:'coffee', label:'Cà phê',   ic:'☕', jar:'spend'},
+  {id:'milktea',label:'Trà sữa',  ic:'🧋', jar:'spend'},
+  {id:'food',   label:'Ăn uống',  ic:'🍜', jar:'spend'},
+  {id:'snack',  label:'Ăn vặt',   ic:'🍡', jar:'spend'},
+  {id:'shop',   label:'Mua sắm',  ic:'🛍️', jar:'spend'},
+  {id:'move',   label:'Đi lại',   ic:'🛵', jar:'spend'},
+  {id:'fun',    label:'Giải trí', ic:'🎟️', jar:'youth'},
+  {id:'study',  label:'Học tập',  ic:'📚', jar:'protect'},
+  {id:'health', label:'Sức khỏe', ic:'💊', jar:'protect'}
+];
+const MOODS = [
+  {id:'stress', label:'Căng thẳng', ic:'😣', c:'--coral',   neg:true,  q:'Món này giải quyết được điều đang làm bạn căng thẳng, hay chỉ xoa dịu cảm xúc trong chốc lát?'},
+  {id:'bored',  label:'Buồn chán',  ic:'🥱', c:'--muted',   neg:true,  q:'Nếu 30 phút nữa bạn hết chán, bạn còn muốn mua món này không?'},
+  {id:'fomo',   label:'Sợ bỏ lỡ',   ic:'👀', c:'--spend',   neg:true,  q:'Nếu ngày mai món này không còn là trend trên mạng, bạn có còn thấy mình cần nó không?'},
+  {id:'sad',    label:'Buồn',       ic:'😔', c:'--peace',   neg:true,  q:'Có cách nào không tốn tiền giúp bạn thấy khá hơn ngay lúc này không?'},
+  {id:'happy',  label:'Vui vẻ',     ic:'😊', c:'--protect', neg:false, q:'Bạn mua vì điều gì? Niềm vui hôm nay có thật sự cần đến món đồ này không?'},
+  {id:'reward', label:'Tự thưởng',  ic:'🎁', c:'--youth',   neg:false, q:'Phần thưởng này bạn đã định từ trước, hay vừa nghĩ ra khi nhìn thấy món đồ?'}
+];
+const JOY = [
+  {id:'day',  label:'Vui được 1 ngày'},
+  {id:'week', label:'Vui được 1 tuần'},
+  {id:'still',label:'Vẫn còn thấy đáng'},
+  {id:'regret',label:'Thấy hối tiếc'}
+];
+const CUTS = [
+  {id:'milktea', label:'ly trà sữa', price:35000},
+  {id:'coffee',  label:'ly cà phê',  price:45000},
+  {id:'snack',   label:'gói ăn vặt', price:25000},
+  {id:'grab',    label:'chuyến xe ôm', price:30000}
+];
+const ICON = {
+  flame:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2c1 3.5 5 6 5 11a5 5 0 0 1-10 0c0-2.2 1-3.8 2-5 .2 1.6 1 2.6 2 3 0-3.5-.5-6 1-9z"/></svg>',
+  shield:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l8 3v6c0 4.5-3.4 8-8 9-4.6-1-8-4.5-8-9V6z"/><path d="M8.5 12l2.5 2.5 4.5-5"/></svg>',
+  heart:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/></svg>'
+};
+
+const fmt = n => Math.round(n).toLocaleString('vi-VN') + 'đ';
+const short = n => Math.abs(n) >= 1e6 ? (Math.round(n/1e5)/10).toString().replace('.', ',') + 'tr' : Math.round(n/1000) + 'k';
+const dec = n => (Math.round(n*10)/10).toString().replace('.', ',');
+const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const dayKey = t => { const d = new Date(t); return d.getFullYear()+'-'+d.getMonth()+'-'+d.getDate(); };
+const startOfDay = t => { const d = new Date(t); d.setHours(0,0,0,0); return d.getTime(); };
+const jarById = id => JARS.find(j => j.id === id);
+const catById = id => CATS.find(c => c.id === id) || {label:'Khác', ic:'•', jar:'spend'};
+const moodById = id => MOODS.find(m => m.id === id);
+let uid = Date.now();
+const nid = () => (uid++).toString(36);
+
+/* jar drawing: glass outline, lid, liquid with a moving wave clipped to the glass */
+function jarSvg(id, c, p){
+  const lvl = 70 - Math.max(0, Math.min(1, p)) * 54;
+  const body = 'M18 9h24v5c8 3 14 10 14 20v30a8 8 0 0 1-8 8H12a8 8 0 0 1-8-8V34c0-10 6-17 14-20z';
+  return `<svg class="jarsvg" viewBox="0 0 60 76" aria-hidden="true"><defs><clipPath id="cj-${id}"><path d="${body}"/></clipPath></defs>
+    <g clip-path="url(#cj-${id})"><rect width="60" height="76" fill="color-mix(in srgb, var(${c}) 10%, var(--surface))"/>
+      <g transform="translate(0 ${lvl.toFixed(1)})"><path class="wave" d="M-60 4q15-6 30 0t30 0t30 0t30 0V80H-60z" fill="var(${c})" opacity=".9"/></g>
+      <rect x="10" y="22" width="5" height="34" rx="2.5" fill="#fff" opacity=".35"/></g>
+    <path d="${body}" fill="none" stroke="var(${c})" stroke-width="3"/>
+    <rect x="14" y="1" width="32" height="8" rx="4" fill="var(${c})"/></svg>`;
+}
+
+function sampleState(){
+  const now = Date.now();
+  const at = (d, h) => startOfDay(now - d*DAY) + h*36e5;
+  const salary = 4000000, bonus = 600000;
+  const alloc = Object.fromEntries(Object.entries(SALARY_SPLIT).map(([k,v]) => [k, salary*v]));
+  const tx = [
+    {type:'in', amount:salary, source:'salary', note:'Lương làm thêm tháng 10', alloc, ts:at(20,9)},
+    {type:'in', amount:bonus, source:'bonus', note:'Thưởng cuộc thi khoa', alloc:{peace:bonus/2, spend:bonus/2}, ts:at(12,18)},
+    {type:'out', amount:120000, cat:'study', jar:'protect', planned:true, note:'Sách IELTS', ts:at(18,15)},
+    {type:'out', amount:90000, cat:'fun', jar:'youth', planned:true, note:'Vé xem phim', ts:at(15,20)},
+    {type:'out', amount:180000, cat:'shop', jar:'spend', planned:false, mood:'fomo', note:'Túi mù Labubu', ts:at(14,21)},
+    {type:'out', amount:350000, cat:'shop', jar:'spend', planned:false, mood:'stress', note:'Áo khoác sale livestream', ts:at(9,22)},
+    {type:'out', amount:39000, cat:'milktea', jar:'spend', planned:false, mood:'fomo', note:'Trà sữa món mới', ts:at(8,16)},
+    {type:'out', amount:25000, cat:'snack', jar:'spend', planned:false, mood:'bored', note:'Bánh tráng trộn', ts:at(6,22)},
+    {type:'out', amount:65000, cat:'shop', jar:'spend', planned:false, mood:'bored', note:'Card bo góc', ts:at(4,23)},
+    {type:'out', amount:55000, cat:'shop', jar:'spend', planned:false, mood:'happy', note:'Hoa tặng bạn', ts:at(3,17)},
+    {type:'out', amount:30000, cat:'move', jar:'spend', planned:true, note:'Xe ôm đi học', ts:at(2,7)},
+    {type:'out', amount:45000, cat:'coffee', jar:'spend', planned:true, note:'Cà phê học nhóm', ts:at(0,8)},
+    {type:'out', amount:40000, cat:'food', jar:'spend', planned:true, note:'Cơm trưa', ts:at(0,12)},
+    {type:'out', amount:35000, cat:'milktea', jar:'spend', planned:false, mood:'bored', note:'Trà sữa chiều', ts:at(0,15)}
+  ];
+  // planned daily meals so the streak has history
+  for (let d = 1; d <= 19; d++) if (d !== 9 && d !== 14) tx.push({type:'out', amount:40000 + (d%3)*10000, cat:'food', jar:'spend', planned:true, note:'Ăn trưa', ts:at(d,12)});
+  tx.forEach(t => t.id = nid());
+  return {
+    sample:true,
+    settings:{wage:25000, rent:1500000, dailyLimit:150000, weekly:150000},
+    goals:{peace:{label:'Quỹ dự phòng 3 tháng', amount:3000000}, youth:{label:'Vé concert cuối năm', amount:1800000}, protect:{label:'Khóa học IELTS', amount:2500000}},
+    tx, skipped:[{amount:180000, note:'Tai nghe sale 11.11', ts:at(5,21)}], joy:{}
+  };
+}
+
+let S;
+try { S = JSON.parse(localStorage.getItem(KEY)) || sampleState(); } catch(e){ S = sampleState(); }
+const save = () => { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch(e){} };
+
+function balances(){
+  const b = {peace:0, youth:0, protect:0, spend:0};
+  for (const t of S.tx){
+    if (t.type === 'in') for (const k in t.alloc) b[k] += t.alloc[k];
+    else b[t.jar] -= t.amount;
+  }
+  return b;
+}
+const jarPct = (id, b) => { const g = S.goals[id]; return Math.max(0, Math.min(1, b[id] / (g ? g.amount : 2000000))); };
+const spentOn = day => S.tx.filter(t => t.type === 'out' && dayKey(t.ts) === dayKey(day)).reduce((a,t) => a + t.amount, 0);
+function streakInfo(){
+  const first = S.tx.length ? startOfDay(Math.min(...S.tx.map(t => t.ts))) : Date.now();
+  const days = [];
+  for (let i = 13; i >= 0; i--){ const d = Date.now() - i*DAY; days.push({ok: spentOn(d) <= S.settings.dailyLimit, has: d >= first}); }
+  let n = 0;
+  for (let i = 0; i < 365; i++){ const d = Date.now() - i*DAY; if (d < first || spentOn(d) > S.settings.dailyLimit) break; n++; }
+  return {n, days};
+}
+const negSpend = () => S.tx.filter(t => t.type === 'out' && !t.planned && t.ts >= Date.now() - 30*DAY && t.mood && moodById(t.mood).neg).reduce((a,t) => a + t.amount, 0);
+
+/* ---------- screens ---------- */
+let tab = 'home';
+const screen = document.getElementById('screen');
+
+function header(){
+  const d = new Date(), h = d.getHours();
+  document.getElementById('today').textContent = d.toLocaleDateString('vi-VN', {weekday:'long', day:'numeric', month:'numeric'});
+  document.getElementById('greet').textContent = h < 11 ? 'Chào buổi sáng' : h < 18 ? 'Chào buổi chiều' : 'Chào buổi tối';
+}
+
+function jarCard(j, b){
+  const g = S.goals[j.id], p = jarPct(j.id, b);
+  return `<button class="jar" data-tab="jars" style="--c:var(${j.c})">
+    <div class="vis">${jarSvg('s-' + j.id, j.c, p)}${g ? `<span class="pct num">${Math.round(p*100)}%</span>` : ''}</div>
+    <div class="name">${j.name}</div><div class="bal num">${fmt(b[j.id])}</div>
+    <div class="goal">${g ? esc(g.label) : j.desc}</div></button>`;
+}
+function txRow(t){
+  if (t.type === 'in'){
+    const src = SOURCES.find(s => s.id === t.source);
+    return `<div class="tx"><div class="tile" style="--c:var(--good)">💰</div><div class="t"><div>${esc(t.note || src.label)}</div><div>${src.label} · ${when(t.ts)}</div></div><div class="amt in num">+${short(t.amount)}</div></div>`;
+  }
+  const c = catById(t.cat), m = t.mood && moodById(t.mood);
+  return `<div class="tx"><div class="tile" style="--c:var(${jarById(t.jar).c})">${c.ic}</div><div class="t"><div>${esc(t.note || c.label)}</div><div><span>${when(t.ts)}</span>${t.planned ? '' : `<span class="tag unplanned">${m ? m.ic + ' ' + m.label.toLowerCase() : 'ngoài kế hoạch'}</span>`}</div></div><div class="amt num">−${short(t.amount)}</div></div>`;
+}
+function when(ts){
+  const d = Math.round((startOfDay(Date.now()) - startOfDay(ts)) / DAY);
+  const hm = new Date(ts).toLocaleTimeString('vi-VN', {hour:'2-digit', minute:'2-digit'});
+  return d === 0 ? 'Hôm nay, ' + hm : d === 1 ? 'Hôm qua' : d + ' ngày trước';
+}
+
+function renderHome(){
+  const b = balances(), spent = spentOn(Date.now()), lim = S.settings.dailyLimit;
+  const pct = spent/lim, left = lim - spent;
+  const st = streakInfo();
+  const saved = S.skipped.reduce((a,s) => a + s.amount, 0);
+  const recent = [...S.tx].sort((a,b) => b.ts - a.ts).slice(0, 6);
+  const pending = followUps().length;
+  const C = 2*Math.PI*40;
+  const ringCol = pct >= 1 ? 'var(--coral)' : pct >= .8 ? 'var(--sun)' : 'var(--hero-ink)';
+  const msg = pct >= 1 ? ['bad', `Đã vượt hạn mức ${fmt(-left)}`] : pct >= .8 ? ['warn', `Đã dùng ${Math.round(pct*100)}% hạn mức, chỉ còn ${short(left)} cho bữa tối`] : ['', 'Bạn đang chi tiêu trong tầm kiểm soát'];
+  screen.innerHTML = `
+    <section class="hero">
+      <div class="hero-top">
+        <div style="min-width:0"><div class="hlabel">HÔM NAY CÒN ĐƯỢC CHI</div>
+          <div class="hbig num">${fmt(Math.max(0, left))}</div>
+          <div class="hsub num">Đã chi ${fmt(spent)} / ${short(lim)}</div></div>
+        <div class="ring"><svg viewBox="0 0 96 96"><circle class="bgc" cx="48" cy="48" r="40"/><circle class="fg" cx="48" cy="48" r="40" stroke="${ringCol}" stroke-dasharray="${C.toFixed(1)}" stroke-dashoffset="${(C*(1-Math.min(1,pct))).toFixed(1)}"/></svg>
+          <span><div><b class="num">${Math.round(pct*100)}%</b>đã dùng</div></span></div>
+      </div>
+      <div class="pill ${msg[0]}">${msg[1]}</div>
+      <div class="streak"><div class="flame">${ICON.flame}</div><div class="t">
+        <b>${st.n} ngày liên tiếp trong hạn mức</b>
+        <div class="dots" aria-hidden="true">${st.days.map(d => `<i class="${!d.has ? '' : d.ok ? 'on' : 'over'}"></i>`).join('')}</div></div></div>
+    </section>
+    <div class="minis">
+      <button class="mini" data-tab="mirror" style="--c:var(--good)"><div class="ic">${ICON.shield}</div><b class="num">${short(saved)}</b><small>giữ lại nhờ ${S.skipped.length} lần dừng trước khi mua</small></button>
+      <button class="mini" data-tab="mirror" style="--c:var(--coral)"><div class="ic">${ICON.heart}</div><b class="num">${short(negSpend())}</b><small>${pending ? pending + ' món đang chờ bạn đánh giá lại' : 'chi theo cảm xúc tiêu cực trong 30 ngày'}</small></button>
+    </div>
+    <div class="sec"><h2>Các hũ của bạn</h2><button class="link" data-tab="jars">Xem chi tiết</button></div>
+    <div class="jars">${JARS.map(j => jarCard(j, b)).join('')}</div>
+    <div class="sec"><h2>Gần đây</h2></div>
+    <section class="card" style="padding-block:6px">
+      ${recent.length ? recent.map(txRow).join('') : '<div class="empty">Chưa có giao dịch. Bấm nút + để nhập khoản tiền đầu tiên.</div>'}</section>`;
+}
+
+let sim = {jar:'youth', cut:'milktea', n:2};
+function renderJars(){
+  const b = balances();
+  if (!S.goals[sim.jar]) sim.jar = Object.keys(S.goals)[0];
+  const g = S.goals[sim.jar], remain = Math.max(0, g.amount - b[sim.jar]);
+  const cut = CUTS.find(c => c.id === sim.cut);
+  const base = Math.ceil(remain / (S.settings.weekly/7));
+  const withCut = Math.ceil(remain / ((S.settings.weekly + cut.price*sim.n)/7));
+  const dateOf = d => new Date(Date.now() + d*DAY).toLocaleDateString('vi-VN', {day:'numeric', month:'numeric'});
+  screen.innerHTML = `
+    <h1>Hũ tài khoản tinh thần</h1>
+    <p class="muted" style="margin:-6px 0 0">Mỗi hũ là một mục đích sống. Đây là hũ ảo: tiền thật vẫn nằm trong tài khoản ngân hàng của bạn.</p>
+    ${JARS.map(j => { const gg = S.goals[j.id], p = jarPct(j.id, b); return `
+      <section class="jarbig" style="--c:var(${j.c})">
+        ${jarSvg('b-' + j.id, j.c, p)}
+        <div class="info">
+          <div class="row between" style="align-items:flex-start"><div style="min-width:0"><div style="font-weight:700;line-height:1.3">${j.name}</div><div class="muted" style="font-size:12.5px">${j.desc}</div></div></div>
+          <div class="amt num" style="font-size:24px;font-weight:800">${fmt(b[j.id])}</div>
+          ${gg ? `<div class="bar"><i style="width:${p*100}%"></i></div><div class="row between muted num" style="font-size:12px"><span>${esc(gg.label)}</span><span>${short(gg.amount)}</span></div>` : '<div class="muted" style="font-size:12px">Nhận 50% lương và 50% tiền bất ngờ. Chi tiêu hằng ngày lấy từ đây.</div>'}
+        </div>
+      </section>`; }).join('')}
+    <section class="card stack">
+      <span class="label">Mô phỏng nếu cắt giảm</span>
+      <h2>Bớt một chút, tới đích sớm hơn bao lâu?</h2>
+      <div class="field"><label for="simJar" class="muted" style="font-size:13px">Mục tiêu</label>
+        <select id="simJar" data-action="simJar">${JARS.filter(j => S.goals[j.id]).map(j => `<option value="${j.id}" ${j.id === sim.jar ? 'selected' : ''}>${esc(S.goals[j.id].label)}</option>`).join('')}</select></div>
+      <div class="chips">${CUTS.map(c => `<button class="chip" data-action="simCut" data-v="${c.id}" aria-pressed="${c.id === sim.cut}">${c.label} · ${short(c.price)}</button>`).join('')}</div>
+      <div class="stepper"><button data-action="simN" data-v="-1" aria-label="Bớt">−</button><span class="num" style="font-weight:700;flex:1;text-align:center">${sim.n} ${cut.label} mỗi tuần</span><button data-action="simN" data-v="1" aria-label="Thêm">+</button></div>
+      ${remain === 0 ? '<div class="note">Hũ này đã đủ tiền cho mục tiêu rồi.</div>' : `
+      <div class="row" style="gap:14px;align-items:center"><div class="bigdays num">−${base - withCut}</div><div class="result">ngày để chạm <b>${esc(g.label.toLowerCase())}</b></div></div>
+      <div class="note result">Còn thiếu <b class="num">${fmt(remain)}</b>. Giữ nhịp ${short(S.settings.weekly)}/tuần, bạn tới đích khoảng <b>${dateOf(base)}</b>. Bớt ${sim.n} ${cut.label} mỗi tuần thì tới sớm hơn, khoảng <b>${dateOf(withCut)}</b>.</div>`}
+    </section>`;
+}
+
+function followUps(){ return S.tx.filter(t => t.type === 'out' && !t.planned && Date.now() - t.ts >= 7*DAY && !S.joy[t.id]); }
+function renderMirror(){
+  const since = Date.now() - 30*DAY;
+  const un = S.tx.filter(t => t.type === 'out' && !t.planned && t.ts >= since);
+  const by = MOODS.map(m => ({m, sum: un.filter(t => t.mood === m.id).reduce((a,t) => a + t.amount, 0)})).filter(x => x.sum > 0).sort((a,b) => b.sum - a.sum);
+  const max = Math.max(1, ...by.map(x => x.sum));
+  const neg = negSpend();
+  const fu = followUps();
+  const rated = Object.entries(S.joy).map(([id, v]) => ({t: S.tx.find(t => t.id === id), v})).filter(x => x.t);
+  screen.innerHTML = `
+    <h1>Gương cảm xúc</h1>
+    <section class="mirrorHero">
+      <div class="hlabel">30 NGÀY QUA, KHI ĐANG KHÔNG ỔN, BẠN ĐÃ CHI</div>
+      <div class="hbig num">${fmt(neg)}</div>
+      <div class="hsub">Bằng <b class="num" style="color:var(--sun)">${Math.round(neg/S.settings.wage)} giờ</b> làm thêm, hay ${dec(neg/S.settings.rent)} tháng tiền trọ.</div>
+    </section>
+    <section class="card stack">
+      <span class="label">Chi ngoài kế hoạch theo cảm xúc</span>
+      ${by.length ? by.map(x => `<div class="mbar" style="--c:var(${x.m.c})"><span>${x.m.ic} ${x.m.label}</span><div class="track"><i style="width:${x.sum/max*100}%"></i></div><span class="v num">${short(x.sum)}</span></div>`).join('') : '<div class="empty">Chưa có khoản chi ngoài kế hoạch nào.</div>'}
+    </section>
+    <section class="card stack">
+      <span class="label">Hỏi lại sau một tuần</span>
+      ${fu.length ? fu.map(t => `<div class="stack" style="gap:8px">
+        <div class="row"><div class="tile" style="--c:var(${moodById(t.mood)?.c || '--muted'})">${catById(t.cat).ic}</div><div style="min-width:0"><b>${esc(t.note || catById(t.cat).label)}</b><div class="muted num" style="font-size:12.5px">${fmt(t.amount)} · ${when(t.ts)}</div></div></div>
+        <div style="font-size:14px;font-weight:600">Món này mang lại niềm vui cho bạn trong bao lâu?</div>
+        <div class="chips">${JOY.map(j => `<button class="chip" data-action="joy" data-id="${t.id}" data-v="${j.id}">${j.label}</button>`).join('')}</div></div>`).join('<hr style="border:0;border-top:1px solid var(--line);margin:4px 0">')
+        : '<div class="muted" style="font-size:14px">Không có món nào cần hỏi lại. Bảy ngày sau mỗi khoản chi ngoài kế hoạch, MOODI sẽ hỏi bạn ở đây.</div>'}
+      ${rated.length ? `<div class="stack" style="gap:8px;padding-top:6px">${rated.map(x => `<div class="row between" style="font-size:13.5px"><span>${esc(x.t.note)}</span><span class="tag">${JOY.find(j => j.id === x.v).label}</span></div>`).join('')}</div>` : ''}
+    </section>
+    <section class="card stack">
+      <span class="label">Những lần bạn dừng lại</span>
+      ${S.skipped.length ? S.skipped.slice().reverse().map(s => `<div class="row between" style="font-size:14px"><span>${esc(s.note)}</span><span class="amt in num">+${short(s.amount)}</span></div>`).join('') : '<div class="muted" style="font-size:14px">Khi bạn bấm “Thôi, để dành” trước khi mua, khoản đó sẽ hiện ở đây.</div>'}
+    </section>`;
+}
+
+function renderSettings(){
+  const s = S.settings;
+  const f = (id, label, v, hint) => `<div class="field"><label for="${id}" style="font-weight:600;font-size:14px">${label}</label><input id="${id}" inputmode="numeric" data-action="setting" data-k="${id}" value="${v.toLocaleString('vi-VN')}"><span class="muted" style="font-size:12.5px">${hint}</span></div>`;
+  screen.innerHTML = `
+    <h1>Cài đặt</h1>
+    <section class="card stack">
+      ${f('wage', 'Lương làm thêm mỗi giờ', s.wage, 'Dùng để quy đổi giá món đồ ra giờ làm.')}
+      ${f('rent', 'Tiền trọ mỗi tháng', s.rent, 'Dùng để so sánh với các khoản chi thiết yếu.')}
+      ${f('dailyLimit', 'Hạn mức chi mỗi ngày', s.dailyLimit, 'MOODI nhắc bạn khi đã dùng 80% hạn mức.')}
+      ${f('weekly', 'Mỗi tuần bạn để dành vào hũ mục tiêu', s.weekly, 'Dùng cho phần mô phỏng cắt giảm.')}
+    </section>
+    <section class="card stack">
+      <span class="label">Luật chia tiền</span>
+      <div style="font-size:14px">Tiền thưởng, lì xì, bán đồ cũ: <b>50%</b> tự vào Quỹ tự do & Bình yên, 50% vào Tiêu vặt.<br>Lương: 50% tiêu vặt, 20% bình yên, 15% trải nghiệm, 15% bảo vệ bản thân.</div>
+    </section>
+    <div class="btns"><button class="btn ghost" data-action="reset">Nạp lại dữ liệu mẫu</button><button class="btn ghost" data-action="clear">Bắt đầu trống</button></div>
+    <p class="muted" style="font-size:12.5px;margin:0">Đây là bản thử nghiệm. Dữ liệu chỉ lưu trong trình duyệt này.</p>`;
+}
+
+function render(){
+  header();
+  document.querySelectorAll('.tab').forEach(t => t.setAttribute('aria-current', t.dataset.tab === tab ? 'page' : 'false'));
+  document.getElementById('sampleBadge').hidden = !S.sample;
+  ({home:renderHome, jars:renderJars, mirror:renderMirror, settings:renderSettings})[tab]();
+}
+
+/* ---------- sheets ---------- */
+const root = document.getElementById('sheetRoot');
+let F = null; // current form state
+const parseAmt = v => parseInt(String(v).replace(/\D/g, '') || '0', 10);
+
+function openSheet(html){ root.innerHTML = `<div class="scrim" data-action="closeScrim"><div class="sheet" role="dialog" aria-modal="true"><div class="grip"></div>${html}</div></div>`; }
+function closeSheet(){ root.innerHTML = ''; F = null; }
+
+function amountBlock(chips){
+  return `<div class="amountWrap"><span class="label">Số tiền</span><div class="row"><input id="amt" class="amountIn num" inputmode="numeric" placeholder="0" value="${F.amount ? F.amount.toLocaleString('vi-VN') : ''}" data-action="amt" aria-label="Số tiền"><span class="cur">đ</span></div></div>
+    <div class="chips">${chips.map(v => `<button class="chip" data-action="quick" data-v="${v}" aria-pressed="${F.amount === v}">${short(v)}</button>`).join('')}</div>`;
+}
+
+function addSheet(){
+  openSheet(`<h2>Bạn muốn ghi gì?</h2>
+    <div class="choose">
+      <button data-action="openIncome"><div class="tile" style="--c:var(--good)">💰</div><b>Khoản thu</b><small>Lương, thưởng, lì xì, bán đồ cũ. MOODI chia vào hũ giúp bạn.</small></button>
+      <button data-action="openExpense"><div class="tile" style="--c:var(--coral)">🧾</div><b>Khoản chi</b><small>Món ngoài kế hoạch sẽ có một bước dừng lại trước khi mua.</small></button>
+    </div>`);
+}
+
+function incomeSheet(){
+  const a = F.amount;
+  const alloc = F.source === 'salary' ? Object.entries(SALARY_SPLIT).map(([k,v]) => [k, a*v]) : [['peace', a/2], ['spend', a/2]];
+  openSheet(`
+    <h2>Nhập khoản thu</h2>
+    ${amountBlock([200000, 500000, 1000000, 4000000])}
+    <div class="stack" style="gap:8px"><span class="label">Tiền này từ đâu?</span>
+      <div class="seg" style="--n:3">${SOURCES.map(s => `<button data-action="src" data-v="${s.id}" aria-pressed="${F.source === s.id}">${s.label}</button>`).join('')}</div></div>
+    ${F.source !== 'salary' ? `<div class="note warn">Tiền bất ngờ thường bị tiêu nhanh hơn tiền lương. MOODI giữ lại <b>50%</b> vào Quỹ tự do & Bình yên trước khi bạn kịp tiêu.</div>` : ''}
+    <div class="card alloc"><span class="label">Sẽ chia vào hũ</span>
+      <div class="stackbar">${alloc.map(([k,v]) => `<i style="--c:var(${jarById(k).c});flex:${v || 1}"></i>`).join('')}</div>
+      ${alloc.map(([k,v]) => `<div class="r" style="--c:var(${jarById(k).c})"><i></i><span>${jarById(k).name}</span><b class="num">${fmt(v)}</b></div>`).join('')}</div>
+    <button class="btn" data-action="saveIncome" ${a ? '' : 'disabled'}>Chia vào hũ</button>`);
+}
+
+function expenseSheet(){
+  const b = balances();
+  const shopFromProtect = F.jar === 'protect' && ['shop','milktea','snack','coffee'].includes(F.cat);
+  openSheet(`
+    <h2>Nhập khoản chi</h2>
+    ${amountBlock([25000, 45000, 100000, 500000])}
+    <div class="stack" style="gap:8px"><span class="label">Cho việc gì?</span>
+      <div class="chips">${CATS.map(c => `<button class="chip" data-action="cat" data-v="${c.id}" aria-pressed="${F.cat === c.id}">${c.ic} ${c.label}</button>`).join('')}</div></div>
+    <div class="stack" style="gap:8px"><span class="label">Lấy từ hũ nào?</span>
+      <div class="jarpick">${JARS.map(j => `<button data-action="jar" data-v="${j.id}" aria-pressed="${F.jar === j.id}" style="--c:var(${j.c})">${j.name}<span class="num">${fmt(b[j.id])}</span></button>`).join('')}</div></div>
+    ${shopFromProtect ? `<div class="note warn">Bạn đang rút từ <b>Quỹ bảo vệ bản thân</b>, hũ dành cho sức khỏe và học tập, để chi cho ${catById(F.cat).label.toLowerCase()}. Chắc chưa?</div>` : ''}
+    <div class="stack" style="gap:8px"><span class="label">Khoản này có trong kế hoạch không?</span>
+      <div class="seg" style="--n:2"><button data-action="planned" data-v="1" aria-pressed="${F.planned === true}">Có, đã định trước</button><button data-action="planned" data-v="0" aria-pressed="${F.planned === false}">Không, tự nhiên muốn mua</button></div></div>
+    <div class="field"><label for="note" class="label">Ghi chú (tuỳ chọn)</label><input id="note" data-action="note" placeholder="Ví dụ: Áo khoác sale" value="${esc(F.note || '')}"></div>
+    <button class="btn" data-action="nextExpense" ${F.amount && F.cat && F.planned !== null ? '' : 'disabled'}>${F.planned === false ? 'Tiếp tục' : 'Lưu khoản chi'}</button>`);
+}
+
+function pauseSheet(){
+  const a = F.amount, s = S.settings, g = S.goals.youth;
+  const hours = a / s.wage, rentFrac = a / s.rent;
+  const m = F.mood && moodById(F.mood);
+  openSheet(`
+    <div><span class="label">Khoan đã, trước khi mua</span>
+    <h2 style="margin-top:4px">${esc(F.note || catById(F.cat).label)} · <span class="num">${fmt(a)}</span></h2></div>
+    <div class="convs">
+      <div class="conv" style="--c:var(--youth)"><b class="num">${hours < 1 ? Math.round(hours*60) + 'p' : dec(hours) + 'h'}</b><span>làm thêm của bạn (${short(s.wage)}/giờ)</span></div>
+      <div class="conv" style="--c:var(--peace)"><b class="num">${rentFrac >= .95 ? '×' + dec(rentFrac) : '1/' + Math.round(1/rentFrac)}</b><span>${rentFrac >= .95 ? 'tháng tiền trọ' : 'tiền trọ tháng này'}</span></div>
+      <div class="conv" style="--c:var(--spend)"><b class="num">${a >= g.amount ? '100%' : '1/' + Math.round(g.amount/a)}</b><span>${esc(g.label.toLowerCase())} bạn đang để dành</span></div>
+    </div>
+    <div class="stack" style="gap:8px"><span class="label">Lúc này bạn đang thấy thế nào?</span>
+      <div class="moods">${MOODS.map(x => `<button class="mood" data-action="mood" data-v="${x.id}" aria-pressed="${F.mood === x.id}" style="--c:var(${x.c})"><span>${x.ic}</span>${x.label}</button>`).join('')}</div></div>
+    ${m ? `<div class="q"><small>Thử tự hỏi</small>${m.q}</div>` : ''}
+    <div class="btns"><button class="btn ghost" data-action="skip">Thôi, để dành</button><button class="btn" data-action="buy" ${m ? '' : 'disabled'}>Vẫn mua</button></div>`);
+}
+
+function addExpense(){
+  S.tx.push({id:nid(), type:'out', amount:F.amount, cat:F.cat, jar:F.jar, planned:F.planned, mood:F.mood || null, note:F.note || catById(F.cat).label, ts:Date.now()});
+  save();
+  const spent = spentOn(Date.now()), lim = S.settings.dailyLimit;
+  closeSheet(); tab = 'home'; render();
+  if (spent > lim) toast(`Bạn đã vượt hạn mức hôm nay ${fmt(spent - lim)}.`);
+  else if (spent >= .8*lim) toast(`Hôm nay bạn đã chi ${Math.round(spent/lim*100)}% hạn mức, chỉ còn ${short(lim - spent)} cho phần còn lại của ngày.`);
+  else toast('Đã lưu khoản chi.');
+}
+
+let toastT;
+function toast(msg){
+  const r = document.getElementById('toastRoot');
+  r.innerHTML = `<div class="toast" role="status">${esc(msg)}</div>`;
+  clearTimeout(toastT); toastT = setTimeout(() => r.innerHTML = '', 4200);
+}
+
+/* ---------- events ---------- */
+const rerenderSheet = () => F && ({income:incomeSheet, expense:expenseSheet, pause:pauseSheet})[F.kind]();
+document.addEventListener('click', e => {
+  const t = e.target.closest('[data-tab],[data-action]');
+  if (!t) return;
+  if (t.dataset.tab){ tab = t.dataset.tab; closeSheet(); render(); window.scrollTo(0,0); return; }
+  const a = t.dataset.action, v = t.dataset.v;
+  switch (a){
+    case 'closeScrim': if (e.target === t) closeSheet(); return;
+    case 'openAdd': addSheet(); return;
+    case 'openIncome': F = {kind:'income', amount:0, source:'salary'}; incomeSheet(); return;
+    case 'openExpense': F = {kind:'expense', amount:0, cat:null, jar:'spend', planned:null, note:'', mood:null}; expenseSheet(); return;
+    case 'quick': F.amount = +v; rerenderSheet(); return;
+    case 'src': F.source = v; incomeSheet(); return;
+    case 'cat': F.cat = v; F.jar = catById(v).jar; expenseSheet(); return;
+    case 'jar': F.jar = v; expenseSheet(); return;
+    case 'planned': F.planned = v === '1'; expenseSheet(); return;
+    case 'saveIncome': {
+      const alloc = F.source === 'salary' ? Object.fromEntries(Object.entries(SALARY_SPLIT).map(([k,x]) => [k, F.amount*x])) : {peace:F.amount/2, spend:F.amount/2};
+      S.tx.push({id:nid(), type:'in', amount:F.amount, source:F.source, alloc, note:SOURCES.find(s => s.id === F.source).label, ts:Date.now()});
+      save(); const kept = F.source !== 'salary' ? F.amount/2 : 0; closeSheet(); render();
+      toast(kept ? `Đã giữ lại ${fmt(kept)} vào Quỹ tự do & Bình yên.` : 'Đã chia lương vào các hũ.'); return;
+    }
+    case 'nextExpense': if (F.planned) addExpense(); else { F.kind = 'pause'; pauseSheet(); } return;
+    case 'mood': F.mood = v; pauseSheet(); return;
+    case 'buy': addExpense(); return;
+    case 'skip': {
+      const amt = F.amount;
+      S.skipped.push({amount:amt, note:F.note || catById(F.cat).label, ts:Date.now()}); save(); closeSheet(); render();
+      toast(`Bạn vừa giữ lại ${fmt(amt)}. Tốt lắm!`); return;
+    }
+    case 'simCut': sim.cut = v; renderJars(); return;
+    case 'simN': sim.n = Math.max(1, Math.min(14, sim.n + +v)); renderJars(); return;
+    case 'joy': S.joy[t.dataset.id] = v; save(); renderMirror(); return;
+    case 'reset': S = sampleState(); save(); tab = 'home'; render(); toast('Đã nạp lại dữ liệu mẫu.'); return;
+    case 'clear': S = {...sampleState(), sample:false, tx:[], skipped:[], joy:{}}; save(); tab = 'home'; render(); toast('Đã xoá dữ liệu mẫu. Bấm nút + để bắt đầu.'); return;
+  }
+});
+document.addEventListener('input', e => {
+  const t = e.target, a = t.dataset.action;
+  if (a === 'amt'){
+    F.amount = parseAmt(t.value);
+    t.value = F.amount ? F.amount.toLocaleString('vi-VN') : '';
+    if (F.kind === 'income'){ const pos = t.value.length; incomeSheet(); const n = document.getElementById('amt'); n.focus(); n.setSelectionRange(pos, pos); }
+    else { const btn = root.querySelector('[data-action="nextExpense"]'); if (btn) btn.disabled = !(F.amount && F.cat && F.planned !== null); }
+  }
+  if (a === 'note') F.note = t.value;
+  if (a === 'setting'){ const n = parseAmt(t.value); if (n > 0){ S.settings[t.dataset.k] = n; save(); } }
+});
+document.addEventListener('change', e => {
+  if (e.target.dataset.action === 'simJar'){ sim.jar = e.target.value; renderJars(); }
+  if (e.target.dataset.action === 'setting'){ e.target.value = parseAmt(e.target.value).toLocaleString('vi-VN'); }
+});
+document.addEventListener('keydown', e => { if (e.key === 'Escape' && root.innerHTML) closeSheet(); });
+
+render();
+})();
+</script>
+</body>
+</html>
